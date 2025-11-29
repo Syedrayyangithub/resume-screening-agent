@@ -1,0 +1,260 @@
+{
+  "name": "Resume Screening Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1iVXDHDFl8Phh-wKN7I52e-1mZKoVMlj3uVkbDlQNUGc",
+          "mode": "list",
+          "cachedResultName": "Resume Scores",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iVXDHDFl8Phh-wKN7I52e-1mZKoVMlj3uVkbDlQNUGc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1iVXDHDFl8Phh-wKN7I52e-1mZKoVMlj3uVkbDlQNUGc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.output.candidate_name }}",
+            "Score": "={{ $json.output.match_score }}",
+            "Reason": "={{ $json.output.reason }}",
+            "Date": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2304,
+        1808
+      ],
+      "id": "e149633f-c499-4f1b-915c-7f86c5d98f10",
+      "name": "Save to Sheets",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YAhW9cwcpffh2krH",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "AI Resume Screener",
+        "formDescription": "Resume Submitted Successfully!",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Candidate Name",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Job Description",
+              "fieldType": "textarea",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Resume",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        1504,
+        1808
+      ],
+      "id": "48f17417-f59d-495a-aa68-4d82035df745",
+      "name": "On form submission",
+      "webhookId": "fe56ded0-a595-491b-b94a-f9eacb93a517",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "text": "={{ 'JOB DESCRIPTION:\\n' + $('On form submission').first().json['Job Description'] + '\\n\\nRESUME TEXT:\\n' + $json.text }}",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "candidate_name",
+              "description": "Full name of the candidate",
+              "required": true
+            },
+            {
+              "name": "match_score",
+              "type": "number",
+              "description": "Match score from 0 to 10",
+              "required": true
+            },
+            {
+              "name": "reason",
+              "description": "One sentence explaining the match score",
+              "required": true
+            }
+          ]
+        },
+        "options": {
+          "systemPromptTemplate": "You are an expert HR Recruitment Agent. Analyze the Resume Text and compare it strictly against the Job Description. Extract the candidate's name, assign a Match Score from 0 to 10, and write a 1-sentence Reason."
+        }
+      },
+      "id": "475d3b38-c4e3-47c2-9cea-097bc8c99ac3",
+      "name": "AI Analysis",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        1952,
+        1808
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-4o-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "id": "d870bd92-2497-4d79-8c54-e6144c3e9755",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        2024,
+        2032
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "pvJzORJmeK6fnqr2",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "Resume",
+        "options": {}
+      },
+      "id": "b0ccd43c-0589-4d75-8c40-e7b91f78b85d",
+      "name": "Extract Resume Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1728,
+        1808
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Analysis": {
+      "main": [
+        [
+          {
+            "node": "Save to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Extract Resume Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Resume Text": {
+      "main": [
+        [
+          {
+            "node": "AI Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "df51a22d-1ca7-4d8a-82e0-df7ce518ca1a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "dfc7fed1f4b1c70f21ab6a562d70d8ebbd4bac80b3a18cc3748366dc1d8fca7a"
+  },
+  "id": "NMZs7cwZBLUBL8sF",
+  "tags": []
+}
