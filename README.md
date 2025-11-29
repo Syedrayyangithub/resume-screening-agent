@@ -1,9 +1,11 @@
 # 📄 AI Resume Screening Agent
 
+### VIDEO DEMO LINK :https://www.loom.com/share/f25698bf63154dbb9ddcf8cc92fd4b3b
+
 ### 1. Overview
 This project is an automated AI Agent designed to streamline the recruitment process. It allows HR managers to upload candidate resumes (PDF) alongside a specific Job Description. The agent uses AI to read the resume, compare it against the job requirements, and strictly rank the candidate with a match score (0-10) and a summary reason. All results are automatically logged to a Google Sheet.
 
-[cite_start]This agent was built as part of the **48-Hour AI Agent Development Challenge** under **Category 1: People & HR**[cite: 13].
+This agent was built as part of the **48-Hour AI Agent Development Challenge** under **Category 1: People & HR**.
 
 ### 2. Features
 * **Automated Interface:** A public web form for easy data entry (built via n8n Form Trigger).
